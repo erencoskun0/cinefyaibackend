@@ -1,0 +1,109 @@
+@CinefyAiServer_HostAddress = http://localhost:5191
+
+GET {{CinefyAiServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+### CinefyAI Authentication API Test Requests
+
+### 0. Rolleri Getir
+GET https://localhost:7243/api/auth/roles
+
+### 1. Kullanıcı Kayıt (Normal User)
+POST https://localhost:7243/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "User123!",
+  "confirmPassword": "User123!",
+  "fullName": "Test Kullanıcı",
+  "roleId": "{{user_role_guid}}"
+}
+
+### 2. Kullanıcı Kayıt (Cinema Owner)
+POST https://localhost:7243/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "owner@example.com",
+  "password": "Owner123!",
+  "confirmPassword": "Owner123!",
+  "fullName": "Sinema Sahibi",
+  "roleId": "{{cinema_owner_role_guid}}"
+}
+
+### 3. Kullanıcı Giriş
+POST https://localhost:7243/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "User123!"
+}
+
+### 4. Mevcut Kullanıcı Bilgilerini Getir (Bearer Token gerekli)
+GET https://localhost:7243/api/auth/me
+Authorization: Bearer {{jwt_token}}
+
+### 5. Token Yenileme
+POST https://localhost:7243/api/auth/refresh-token
+Content-Type: application/json
+
+{
+  "token": "{{jwt_token}}",
+  "refreshToken": "{{refresh_token}}"
+}
+
+### 6. Çıkış Yap
+POST https://localhost:7243/api/auth/logout
+Authorization: Bearer {{jwt_token}}
+
+### 7. Admin Kullanıcısı ile Giriş
+POST https://localhost:7243/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@cinefyai.com",
+  "password": "Admin123!"
+}
+
+###
+
+### CinefyAI Movies API Test Requests
+
+### 8. Tüm Filmleri Listele
+GET https://localhost:7243/api/movies?page=1&pageSize=10
+
+### 9. Film Ara
+GET https://localhost:7243/api/movies?search=Avengers&genre=Aksiyon
+
+### 10. Film Detayını Getir
+GET https://localhost:7243/api/movies/{{movie_id}}
+
+### 11. Film Ekle (Multipart/Form-Data - Postman/Insomnia kullanın)
+# Bu endpoint için Postman veya Insomnia kullanmanız gerekiyor
+# POST https://localhost:7243/api/movies
+# Authorization: Bearer {{jwt_token}}
+# Content-Type: multipart/form-data
+# Form fields:
+# - title: "Test Film"
+# - genre: "Aksiyon"
+# - duration: 120
+# - description: "Test film açıklaması"
+# - director: "Test Yönetmen"
+# - cast: "Test Oyuncu 1, Test Oyuncu 2"
+# - language: "Türkçe"
+# - country: "Türkiye"
+# - ageRestriction: "13+"
+# - image: [file upload]
+
+### 12. Film Güncelle (Bearer Token gerekli)
+PUT https://localhost:7243/api/movies/{{movie_id}}
+Authorization: Bearer {{jwt_token}}
+Content-Type: multipart/form-data
+
+### 13. Film Sil (Admin only)
+DELETE https://localhost:7243/api/movies/{{movie_id}}
+Authorization: Bearer {{jwt_token}}
+
+###

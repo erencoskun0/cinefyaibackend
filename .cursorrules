@@ -1,0 +1,141 @@
+# CinefyAI Sinema Rezervasyon Sistemi - Cursor Rules
+
+Bu proje, kullanıcıların sinema salonlarını, seansları görüntüleyip bilet alabildiği modern bir sinema rezervasyon sistemidir.
+
+## 📋 Proje Özeti
+- **Teknoloji Stack**: ASP.NET Core 9.0, Entity Framework Core, SQL Server, ASP.NET Identity
+- **Mimari**: Clean Architecture, Domain-Driven Design prensipleri
+- **Veritabanı**: MSSQL Server, Code-First yaklaşımı
+- **Auth**: ASP.NET Identity ile kullanıcı yönetimi
+
+## 🏗️ Temel Entity Yapısı
+- **User**: ASP.NET Identity tabanlı kullanıcı sistemi
+- **Cinema**: Sinema salonları ve sahipleri
+- **Hall**: Sinema salonlarına ait müzik/film salonları
+- **Seat**: Salonlardaki koltuk bilgileri
+- **Movie**: Film bilgileri (AI etiketleme destekli)
+- **Show**: Seanslar (film + salon + tarih/saat)
+- **Ticket**: Bilet rezervasyonları
+- **Review**: Film değerlendirmeleri
+- **AILog**: AI öneri logları
+
+## 🎯 Kodlama Standartları
+
+### C# ve .NET Kuralları
+- **Naming**: PascalCase (sınıflar, metodlar), camelCase (local değişkenler)
+- **Async/Await**: Tüm veritabanı işlemleri async olmalı
+- **Nullable**: Nullable reference types kullan (`<Nullable>enable</Nullable>`)
+- **Using Statements**: File-scoped using statements tercih et
+- **Primary Constructors**: .NET 9.0 özelliklerini kullan
+
+### Entity Framework Kuralları
+- **DbContext**: `ApplicationDbContext` sınıfını kullan
+- **Migrations**: Code-First yaklaşımı, migration'ları düzenli güncelle
+- **Relationships**: Fluent API ile ilişkileri `OnModelCreating` içinde tanımla
+- **Lazy Loading**: Navigation property'ler için include kullan
+- **Concurrency**: Optimistic concurrency kontrolü ekle
+
+### API Design Kuralları
+- **RESTful**: REST prensiplerini takip et
+- **Status Codes**: Doğru HTTP status kodları kullan
+- **DTOs**: Entity'leri direkt dönme, DTO kullan
+- **Validation**: Model validation attribute'ları kullan
+- **Error Handling**: Global exception handling middleware ekle
+
+## 📁 Dosya ve Klasör Yapısı
+
+```
+CinefyAiServer/
+├── Controllers/           # API Controller'lar
+├── Entities/             # Domain Entity'ler
+│   ├── DTOs/            # Data Transfer Objects
+│   └── *.cs             # Entity sınıfları
+├── Data/                # DbContext ve konfigürasyonlar
+├── Services/            # Business logic servisler
+├── Repositories/        # Repository pattern
+├── Middlewares/         # Custom middleware'ler
+├── Extensions/          # Extension metodlar
+├── Configurations/      # Startup konfigürasyonları
+├── Migrations/          # EF Core migration'ları
+└── Helpers/            # Yardımcı sınıflar
+```
+
+## 🔐 Güvenlik Kuralları
+- **Authentication**: ASP.NET Identity kullan
+- **Authorization**: Role-based yetkilendirme (User, Cinema Owner, Admin)
+- **Password**: BCrypt.Net ile hash'leme
+- **CORS**: Gerekli origin'lere izin ver
+- **Input Validation**: Tüm input'ları validate et
+- **SQL Injection**: EF Core parametrized queries kullan
+
+## 🎬 İş Kuralları
+
+### Rezervasyon Sistemi
+- Bir kullanıcı aynı seansa birden fazla bilet alabilir
+- Aynı koltuk aynı seans için sadece bir kez satılabilir
+- Geçmiş tarihli seanslar için bilet satılamaz
+- QR kod her bilet için unique olmalı
+
+### Sinema Yönetimi
+- Cinema Owner sadece kendi sinemalarını yönetebilir
+- Admin tüm sinemaları yönetebilir
+- Hall'lar silindiğinde tüm seat'lar silinir (Cascade)
+- Show silindiğinde ticket'lar silinir (Cascade)
+
+### Film ve Seans Yönetimi
+- Film'ler IsActive = false ile soft delete
+- Show'lar gelecek tarih/saat için oluşturulabilir
+- Movie'lere AI tag'ları otomatik eklenebilir
+- Review sadece geçmiş seansları izlemiş kullanıcılar yapabilir
+
+## 📊 Performans Kuralları
+- **Indexing**: Sık sorgulanan alanlara index ekle
+- **Caching**: Memory cache veya Redis kullan
+- **Pagination**: Büyük veri setleri için sayfalama
+- **Lazy Loading**: Include ile explicit loading
+- **Connection Pooling**: EF Core connection pooling aktif
+
+## 🧪 Test Kuralları
+- **Unit Tests**: xUnit framework kullan
+- **Integration Tests**: TestServer ile API testleri
+- **Repository Tests**: InMemory database ile test
+- **Mock**: Moq framework ile dependency mocking
+- **Coverage**: Minimum %80 kod kapsamı hedefle
+
+## 📝 API Endpoint Örnekleri
+
+```csharp
+// Show Controller Endpoints
+GET    /api/shows                          # Tüm seanslar
+GET    /api/shows/date/{date}              # Tarihe göre seanslar
+GET    /api/shows/cinema/{cinemaId}        # Sinemaya göre seanslar
+POST   /api/shows                          # Yeni seans oluştur
+PUT    /api/shows/{id}                     # Seans güncelle
+DELETE /api/shows/{id}                     # Seans sil
+
+// Ticket Controller Endpoints
+GET    /api/tickets/user/{userId}          # Kullanıcının biletleri
+POST   /api/tickets                        # Bilet satın al
+GET    /api/tickets/{id}/qr                # QR kod
+DELETE /api/tickets/{id}                   # Bilet iptal
+```
+
+## 🔄 Migration Kuralları
+- Migration adları açıklayıcı olsun: `Add_Show_Entity_And_Relations`
+- Seed data için separate migration'lar oluştur
+- Production'da migration'ları otomatik çalıştır
+- Rollback planı her migration için hazır olsun
+
+## 📱 Frontend Entegrasyonu (Gelecek)
+- CORS policy'si frontend URL'leri için hazır
+- JWT token authentication desteği
+- Real-time bildirimler için SignalR hazırlığı
+- API versioning desteği
+
+## 🎨 Code Style
+- EditorConfig dosyası kullan
+- Code analysis rules aktif
+- XML documentation comments ekle
+- Kod formatı için otomatik formatter
+
+Bu kurallar projenin tutarlılığını, performansını ve maintainability'sini sağlamak için tasarlanmıştır. 
